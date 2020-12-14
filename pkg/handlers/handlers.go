@@ -85,13 +85,18 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, "Unauthorized")
 		return
 	}
-
+	c.SetCookie("token", response.Authorization, 3600, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, response)
 }
 
 // AuthCheck needed to test authentication
 func AuthCheck(c *gin.Context) {
-	c.JSON(http.StatusOK, "secure endpoint")
+	_, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, "You must login in the system")
+	} else {
+		c.JSON(http.StatusOK, "secure endpoint")
+	}
 }
 
 // GetAllTasks returns all tasks list

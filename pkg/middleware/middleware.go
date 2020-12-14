@@ -2,6 +2,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,12 @@ import (
 // AuthMiddleware checks if a valid token exists
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("Authorization")
+		token, err := c.Cookie("token")
+		log.Println(token)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, "You must login in the system.")
+			return
+		}
 		id, err := auth.ParseToken(strings.TrimPrefix(token, "Bearer "))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, "Invalid token")
