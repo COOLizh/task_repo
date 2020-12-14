@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "pkg/pb";
+
+message codeHandleRequest{
+    string solutionID = 1;
+    bytes solution = 2;
+    int64 memoryLimit = 3;
+    int64 timeLimit = 4;
+    string language = 5;
+    message TestCase{
+        string ID = 1;
+        bytes testData = 2;
+        bytes answer = 3;
+    }
+    repeated TestCase TestCases = 6;
+}
+
+message codeHandleResponse{
+    string ID = 1;
+    bool jobCreated = 2;
+}
+
+service CodeHandler{
+    rpc codeHandle(codeHandleRequest) returns(codeHandleResponse) {}
+}
+
+message statusHandleRequest{
+    string ID = 1;
+}
+
+message statusHandleResponse{
+    string ID = 1;
+    bool ready = 2;
+    message TestsData{
+        int64 PassedTestsCount = 1;
+        message TestResult{
+            string Result = 1;
+            int64 TimeSpent = 2;
+            int64 MemorySpent = 3;
+        }
+        repeated TestResult TestResults = 2;
+    }
+    TestsData testsData = 3;
+}
+
+service statusHandler{
+    rpc statusCheck(statusHandleRequest) returns(statusHandleResponse) {}
+}
